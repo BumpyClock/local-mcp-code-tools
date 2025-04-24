@@ -1,0 +1,50 @@
+{
+  "name": "code-tools-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for code tools and operations",
+  "main": "dist/server.js",
+  "type": "module",
+  "bin": {
+    "code-tools-server": "dist/bin/server.js",
+    "code-tools-client": "dist/bin/client.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/bin/server.js",
+    "client": "node dist/bin/client.js",
+    "dev": "tsc-watch --onSuccess \"node dist/bin/server.js\"",
+    "lint": "eslint --ext .ts src/",
+    "test": "echo \"No tests configured\"",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "latest",
+    "diff": "^5.1.0",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/diff": "^5.0.8",
+    "@types/node": "^20.10.5",
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0",
+    "eslint": "^8.56.0",
+    "rimraf": "^5.0.5",
+    "tsc-watch": "^6.0.4",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "code-tools",
+    "llm"
+  ],
+  "author": "",
+  "license": "MIT"
+}
