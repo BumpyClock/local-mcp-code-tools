@@ -1,0 +1,22 @@
+{
+    "mcpServers": {
+      "filesystem": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@modelcontextprotocol/server-filesystem",
+          "C:\\Users\\adity\\OneDrive\\Desktop",
+          "C:\\Users\\adity\\Downloads",
+          "C:\\Users\\adity\\Projects",
+          "C:\\Users\\adity\\Documents"
+        ]
+      },
+      "code-tools": {
+        "command": "node",
+        "args": [
+          "C:\\Users\\adity\\Projects\\local-mcp-code-tools\\dist\\server.js"
+        ],
+        "cwd": "C:\\Users\\adity\\OneDrive\\Desktop\\mcp-test-project"
+      }
+    }
+  }
