@@ -1,155 +1,148 @@
-# CodeTools MCP
+# CodeTools MCP Server
 
-A TypeScript-based Model Context Protocol (MCP) server providing tools for code development, file operations, and project management.
+An MCP (Model Context Protocol) server that provides tools and resources for code-related operations. This server can be integrated with LLM applications to provide context-aware code tools, file system access, and project management capabilities.
 
-## Overview
+## Features
 
-CodeTools MCP is a server implementation of the [Model Context Protocol](https://modelcontextprotocol.io) that provides various tools and resources to help with development tasks:
+### Tools
 
-- **File Operations:** Read, write, search, and modify files
-- **Project Management:** Initialize projects, run commands, manage Git repositories
-- **Code Generation:** Generate tests, documentation, and more through prompts
+- **File Operations**
+  - `update_file` - Create or modify files
+  - `apply_patch` - Apply unified diff patches to files
+  - `list_directory` - List contents of a directory
+  - `create_directory` - Create new directories
+  - `search_files` - Search for patterns in files
+
+- **Project Management**
+  - `init_npm_project` - Initialize a new NPM project
+  - `git_operation` - Perform git operations
+  - `run_command` - Run shell commands
+  - `ping` - Check server status
+
+### Resources
+
+- **file** - Access files and directories (`file://{path}`)
+- **project** - Get project structure information (`project://{path}`)
+
+### Prompts
+
+- **code-review** - Get a code review
+- **generate-tests** - Generate tests for code
+- **generate-docs** - Generate documentation for code
+- **refactor-code** - Get refactoring suggestions
 
 ## Installation
 
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/your-username/code-tools-mcp.git
 cd code-tools-mcp
 
 # Install dependencies
 npm install
 
-# Build the TypeScript code
+# Build the server
 npm run build
-
-# Link the package (optional, for global use)
-npm link
 ```
 
 ## Usage
 
-### Running the Server
-
-You can run the server directly:
+### Starting the Server
 
 ```bash
+# Start the server using stdio transport (for MCP clients)
 npm start
+
+# Or use the executable directly
+./dist/bin/server.js
 ```
 
-Or if you've linked the package:
+### Using the Test Client
 
 ```bash
-code-tools-server
-```
-
-### Running the Test Client
-
-To test the server with the provided client:
-
-```bash
+# Run the test client
 npm run client
+
+# Test with HTTP transport
+node client.js --http --url=http://localhost:3000/mcp
 ```
 
-Or if you've linked the package:
+## Examples
 
-```bash
-code-tools-client
+### Using the File Resource
+
+```javascript
+// Read a file using the file resource
+const fileResult = await client.readResource({
+  uri: `file:///path/to/your/file.js`,
+});
 ```
 
-### Development Mode
+### Using the Code Review Prompt
 
-To run the server in development mode with auto-restart:
-
-```bash
-npm run dev
+```javascript
+// Get a code review for a piece of code
+const promptResult = await client.getPrompt({
+  name: "code-review",
+  arguments: {
+    code: `function add(a, b) { return a + b; }`,
+    language: "javascript",
+  },
+});
 ```
 
-## TypeScript Development
+### Updating a File
 
-This project uses TypeScript for type safety and better development experience. The source code is in the `src` directory and gets compiled to JavaScript in the `dist` directory.
-
-### Compiling TypeScript
-
-```bash
-# Build the project
-npm run build
-
-# Watch mode with automatic rebuilding
-npm run dev
-
-# Clean build output
-npm run clean
+```javascript
+// Update or create a file
+const updateResult = await client.callTool({
+  name: "update_file",
+  arguments: {
+    filePath: "/path/to/your/file.js",
+    newContent: "// New content for the file\nconsole.log('Hello, world!');"
+  },
+});
 ```
 
-### Type Checking and Linting
+## Troubleshooting
 
-```bash
-# Run TypeScript type checking
-npx tsc --noEmit
+### File Resource Issues
 
-# Run ESLint
-npm run lint
-```
+If you encounter issues with the file resource, check that:
+- The file path exists and is accessible
+- You're using the correct URI format: `file:///absolute/path/to/file`
+- The server has permission to read the file
 
-## Project Structure
+### Connection Issues
+
+If you have trouble connecting to the server:
+- For stdio transport, ensure the server is running before connecting the client
+- For HTTP transport, verify the server is listening on the correct port
+- Check for any firewall or permission issues
+
+## Development
+
+### Project Structure
 
 ```
 code-tools-mcp/
-├─ src/               # TypeScript source code
-│  ├─ bin/            # Executable scripts
-│  │  ├─ server.ts    # Server executable
-│  │  └─ client.ts    # Client executable
-│  ├─ prompts/        # MCP prompts
-│  ├─ resources/      # MCP resources
-│  ├─ tools/          # MCP tools
-│  ├─ types/          # TypeScript type definitions
-│  ├─ utils/          # Utility functions
-│  ├─ server.ts       # Main server implementation
-│  └─ client.ts       # Test client implementation
-├─ dist/              # Compiled JavaScript output
-├─ tsconfig.json      # TypeScript configuration
-├─ package.json       # Project configuration
-└─ README.md          # Project documentation
+├── src/
+│   ├── bin/             # Executable entry points
+│   ├── prompts/         # Prompt implementations
+│   ├── resources/       # Resource implementations
+│   ├── tools/           # Tool implementations
+│   ├── types/           # TypeScript type definitions
+│   ├── utils/           # Shared utility functions
+│   ├── client.ts        # Client implementation
+│   └── server.ts        # Server implementation
+├── dist/                # Compiled JavaScript output
+└── test/                # Tests
 ```
 
-## Available Tools
+### Adding New Tools
 
-### File Operations
-
-- **update_file:** Create or update a file with specified content
-- **apply_patch:** Apply a unified diff patch to a file
-- **list_directory:** List the contents of a directory
-- **create_directory:** Create a new directory
-- **search_files:** Search for text patterns in files
-
-### Project Operations
-
-- **init_npm_project:** Initialize a new NPM project
-- **git_operation:** Perform Git operations (clone, init, status, etc.)
-- **run_command:** Execute shell commands
-- **ping:** Check if the server is responsive
-
-## Available Resources
-
-- **file://{path}:** Access files and directories in the filesystem
-- **project://{path}:** Get information about a project's structure
-
-## Available Prompts
-
-- **code-review:** Get a comprehensive code review
-- **generate-tests:** Generate tests for given code
-- **generate-docs:** Generate documentation for given code
-- **refactor-code:** Get suggestions for code refactoring
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch: `git checkout -b feature/my-new-feature`
-3. Commit your changes: `git commit -am 'Add some feature'`
-4. Push to the branch: `git push origin feature/my-new-feature`
-5. Submit a pull request
+To add a new tool, create a new file in the `src/tools` directory and follow the pattern used in the existing tools. Then register your tool in the appropriate index.ts file.
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+MIT

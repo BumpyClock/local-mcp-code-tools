@@ -12,6 +12,7 @@
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,
+    "emitDeclarationOnly": false,
     "resolveJsonModule": true,
     "rootDir": "src"
   },

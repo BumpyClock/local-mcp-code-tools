@@ -14,7 +14,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // Path to the server script
-const serverPath = resolve(__dirname, "./server.js");
+const serverPath = resolve(__dirname, "./server.ts");
 
 /**
  * Run a test client connecting to the server

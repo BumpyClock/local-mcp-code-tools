@@ -2,16 +2,12 @@
  * Utils module index
  */
 
-import logger from './logger.js';
-import file from './file.js';
-import process from './process.js';
-import { Utils } from '../types/index.js';
+import logger from "./logger.js";
+import file from "./file.js";
+import process from "./process.js";
+import { Utils } from "../types/index.js";
 
-export {
-  logger,
-  file,
-  process,
-};
+export { logger, file, process };
 
 const utils: Utils = {
   logger,

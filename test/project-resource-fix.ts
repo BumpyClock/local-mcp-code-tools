@@ -1,5 +1,5 @@
 /**
- * Project Resource
+ * Project Resource with fixed URI handling
  *
  * Resource for accessing project structure and information
  */
@@ -12,22 +12,66 @@ import { ResourceResponse } from "../types/index.js";
 import { process as processUtils, logger } from "../utils/index.js";
 
 /**
+ * Extract a project path from a URL
+ * @param {URL} uri - The resource URI
+ * @param {Record<string, unknown>} variables - The variables from the resource template
+ * @returns {string} The project path
+ */
+function extractProjectPath(uri: URL, variables: Record<string, unknown>): string {
+  logger.debug(`Extracting project path from URI: ${uri.href}`, { 
+    protocol: uri.protocol,
+    pathname: uri.pathname,
+    variables
+  });
+  
+  let projectPath;
+  
+  // If the URI uses the project: protocol, extract the path directly from the URI
+  if (uri.protocol === 'project:') {
+    // Extract path from the full URI pathname
+    projectPath = decodeURIComponent(uri.pathname);
+    
+    // On Windows, remove leading slash if present and path has a drive letter
+    if (process.platform === 'win32' && projectPath.startsWith('/') && projectPath[2] === ':') {
+      projectPath = projectPath.slice(1);
+    }
+  } else {
+    // Fall back to the variables
+    if (Array.isArray(variables.path)) {
+      projectPath = variables.path[0];
+    } else {
+      projectPath = String(variables.path);
+    }
+  }
+  
+  logger.debug(`Extracted project path: ${projectPath}`);
+  
+  // Convert to absolute path if relative
+  if (!path.isAbsolute(projectPath)) {
+    logger.debug(`Converting relative path to absolute: ${projectPath}`);
+    projectPath = path.resolve(process.cwd(), projectPath);
+  }
+  
+  return projectPath;
+}
+
+/**
  * Register the project resource with the MCP server
  * @param {McpServer} server - The MCP server instance
  */
 export function registerProjectResource(server: McpServer): void {
-  logger.info("Registering project resource");
+  logger.info("Registering project resource with improved URI handling");
 
   server.resource(
     "project",
-    new ResourceTemplate("project://{path}", { list: undefined }),
+    new ResourceTemplate("project://{path*}", { list: undefined }),
     async (
       uri: URL,
-      variables: { [key: string]: string | string[] }
+      variables: Record<string, unknown>
     ): Promise<ResourceResponse> => {
-      const projectPath = Array.isArray(variables.path)
-        ? variables.path[0]
-        : variables.path;
+      // Extract the project path from the URI
+      const projectPath = extractProjectPath(uri, variables);
+      
       try {
         logger.debug(`Analyzing project structure at: ${projectPath}`);
 
@@ -55,7 +99,15 @@ export function registerProjectResource(server: McpServer): void {
           `Failed to analyze project structure at '${projectPath}':`,
           { error: err.message }
         );
-        throw new Error(`Failed to analyze project: ${err.message}`);
+        
+        // More descriptive error messages
+        if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+          throw new Error(`Project directory not found: ${projectPath}. Please check that the path exists.`);
+        } else if ((error as NodeJS.ErrnoException).code === 'EACCES') {
+          throw new Error(`Permission denied when accessing project: ${projectPath}. Please check directory permissions.`);
+        } else {
+          throw new Error(`Failed to analyze project: ${err.message}`);
+        }
       }
     }
   );

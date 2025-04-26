@@ -1,13 +1,13 @@
 /**
  * File utility functions for CodeTools MCP
- * 
+ *
  * Provides helper functions for common file operations
  */
 
-import fs from 'fs/promises';
-import path from 'path';
-import { FileReadResult, FileUtils } from '../types/index.js';
-import logger from './logger.js';
+import fs from "fs/promises";
+import path from "path";
+import { FileReadResult, FileUtils } from "../types/index.js";
+import logger from "./logger.js";
 
 /**
  * Determine the MIME type based on file extension
@@ -17,40 +17,40 @@ import logger from './logger.js';
 export function getMimeType(filePath: string): string {
   const extension = path.extname(filePath).toLowerCase();
   const mimeTypes: Record<string, string> = {
-    '.html': 'text/html', 
-    '.css': 'text/css', 
-    '.js': 'text/javascript', 
-    '.mjs': 'text/javascript',
-    '.json': 'application/json', 
-    '.xml': 'application/xml',
-    '.png': 'image/png', 
-    '.jpg': 'image/jpeg', 
-    '.jpeg': 'image/jpeg', 
-    '.gif': 'image/gif',
-    '.svg': 'image/svg+xml', 
-    '.webp': 'image/webp', 
-    '.ico': 'image/x-icon',
-    '.pdf': 'application/pdf', 
-    '.zip': 'application/zip', 
-    '.tar': 'application/x-tar',
-    '.gz': 'application/gzip', 
-    '.wasm': 'application/wasm',
-    '.md': 'text/markdown', 
-    '.txt': 'text/plain', 
-    '.csv': 'text/csv',
-    '.py': 'text/x-python', 
-    '.java': 'text/x-java-source', 
-    '.c': 'text/x-c', 
-    '.cpp': 'text/x-c++',
-    '.ts': 'text/typescript', 
-    '.tsx': 'text/tsx', 
-    '.jsx': 'text/jsx',
-    '.woff': 'font/woff', 
-    '.woff2': 'font/woff2', 
-    '.ttf': 'font/ttf', 
-    '.otf': 'font/otf',
+    ".html": "text/html",
+    ".css": "text/css",
+    ".js": "text/javascript",
+    ".mjs": "text/javascript",
+    ".json": "application/json",
+    ".xml": "application/xml",
+    ".png": "image/png",
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".gif": "image/gif",
+    ".svg": "image/svg+xml",
+    ".webp": "image/webp",
+    ".ico": "image/x-icon",
+    ".pdf": "application/pdf",
+    ".zip": "application/zip",
+    ".tar": "application/x-tar",
+    ".gz": "application/gzip",
+    ".wasm": "application/wasm",
+    ".md": "text/markdown",
+    ".txt": "text/plain",
+    ".csv": "text/csv",
+    ".py": "text/x-python",
+    ".java": "text/x-java-source",
+    ".c": "text/x-c",
+    ".cpp": "text/x-c++",
+    ".ts": "text/typescript",
+    ".tsx": "text/tsx",
+    ".jsx": "text/jsx",
+    ".woff": "font/woff",
+    ".woff2": "font/woff2",
+    ".ttf": "font/ttf",
+    ".otf": "font/otf",
   };
-  return mimeTypes[extension] || 'application/octet-stream';
+  return mimeTypes[extension] || "application/octet-stream";
 }
 
 /**
@@ -59,7 +59,8 @@ export function getMimeType(filePath: string): string {
  * @returns {boolean} True if the file is likely binary
  */
 export function isBinaryFile(filePath: string): boolean {
-  const knownBinaryExtensions = /\.(jpg|jpeg|png|gif|bmp|ico|pdf|zip|tar|gz|exe|dll|so|bin|dat|webp|woff|woff2|ttf|otf)$/i;
+  const knownBinaryExtensions =
+    /\.(jpg|jpeg|png|gif|bmp|ico|pdf|zip|tar|gz|exe|dll|so|bin|dat|webp|woff|woff2|ttf|otf)$/i;
   return knownBinaryExtensions.test(filePath);
 }
 
@@ -69,14 +70,19 @@ export function isBinaryFile(filePath: string): boolean {
  * @param {boolean} [recursive=true] - Whether to create parent directories
  * @returns {Promise<void>}
  */
-export async function ensureDirectory(dirPath: string, recursive = true): Promise<void> {
+export async function ensureDirectory(
+  dirPath: string,
+  recursive = true
+): Promise<void> {
   try {
     await fs.mkdir(dirPath, { recursive });
     logger.debug(`Ensured directory exists: ${dirPath}`);
   } catch (error) {
     const err = error as NodeJS.ErrnoException;
-    if (err.code !== 'EEXIST') {
-      logger.error(`Failed to ensure directory exists: ${dirPath}`, { error: err.message });
+    if (err.code !== "EEXIST") {
+      logger.error(`Failed to ensure directory exists: ${dirPath}`, {
+        error: err.message,
+      });
       throw error;
     }
   }
@@ -88,7 +94,10 @@ export async function ensureDirectory(dirPath: string, recursive = true): Promis
  * @param {string|Buffer} content - Content to write
  * @returns {Promise<void>}
  */
-export async function safeWriteFile(filePath: string, content: string | Buffer): Promise<void> {
+export async function safeWriteFile(
+  filePath: string,
+  content: string | Buffer
+): Promise<void> {
   const dirPath = path.dirname(filePath);
   await ensureDirectory(dirPath);
   await fs.writeFile(filePath, content);
@@ -101,21 +110,24 @@ export async function safeWriteFile(filePath: string, content: string | Buffer):
  * @param {boolean} [forceBinary=false] - Force reading as binary
  * @returns {Promise<{content: string|Buffer, isBinary: boolean}>}
  */
-export async function safeReadFile(filePath: string, forceBinary = false): Promise<FileReadResult> {
+export async function safeReadFile(
+  filePath: string,
+  forceBinary = false
+): Promise<FileReadResult> {
   try {
     const fileStats = await fs.stat(filePath);
-    
+
     if (fileStats.isDirectory()) {
       throw new Error(`Path is a directory, not a file: ${filePath}`);
     }
-    
+
     const shouldReadAsBinary = forceBinary || isBinaryFile(filePath);
-    
+
     if (shouldReadAsBinary) {
       const content = await fs.readFile(filePath);
       return { content, isBinary: true };
     } else {
-      const content = await fs.readFile(filePath, 'utf8');
+      const content = await fs.readFile(filePath, "utf8");
       return { content, isBinary: false };
     }
   } catch (error) {

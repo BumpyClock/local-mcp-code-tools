@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeTools MCP Server Documentation</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1, h2, h3 {
+            color: #1a73e8;
+        }
+        code {
+            background-color: #f5f5f5;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .method {
+            color: #e91e63;
+            font-weight: bold;
+        }
+        .path {
+            color: #4caf50;
+        }
+    </style>
+</head>
+<body>
+    <h1>CodeTools MCP Server</h1>
+    
+    <p>This documentation provides information about the CodeTools MCP server, including available tools, resources, and prompts.</p>
+    
+    <h2>What is MCP?</h2>
+    
+    <p>The <a href="https://modelcontextprotocol.io/" target="_blank">Model Context Protocol (MCP)</a> allows applications to provide context for LLMs in a standardized way. The CodeTools MCP server implements the MCP specification to provide code-related tools and resources.</p>
+    
+    <h2>Available Tools</h2>
+    
+    <h3>File Tools</h3>
+    
+    <table>
+        <tr>
+            <th>Tool Name</th>
+            <th>Description</th>
+            <th>Parameters</th>
+        </tr>
+        <tr>
+            <td><code>update_file</code></td>
+            <td>Create or update a file with new content</td>
+            <td>
+                <code>filePath</code>: Path to the file<br>
+                <code>newContent</code>: Content to write
+            </td>
+        </tr>
+        <tr>
+            <td><code>apply_patch</code></td>
+            <td>Apply a unified diff patch to a file</td>
+            <td>
+                <code>filePath</code>: Path to the file<br>
+                <code>unifiedDiff</code>: Patch content
+            </td>
+        </tr>
+        <tr>
+            <td><code>list_directory</code></td>
+            <td>List contents of a directory</td>
+            <td><code>path</code>: Directory path</td>
+        </tr>
+        <tr>
+            <td><code>create_directory</code></td>
+            <td>Create a new directory</td>
+            <td>
+                <code>path</code>: Directory path<br>
+                <code>parents</code>: Create parent directories (optional, default: false)
+            </td>
+        </tr>
+        <tr>
+            <td><code>search_files</code></td>
+            <td>Search for a pattern in files</td>
+            <td>
+                <code>pattern</code>: Search pattern<br>
+                <code>path</code>: Directory path<br>
+                <code>recursive</code>: Search recursively (optional, default: true)
+            </td>
+        </tr>
+    </table>
+    
+    <h3>Project Tools</h3>
+    
+    <table>
+        <tr>
+            <th>Tool Name</th>
+            <th>Description</th>
+            <th>Parameters</th>
+        </tr>
+        <tr>
+            <td><code>init_npm_project</code></td>
+            <td>Initialize a new NPM project</td>
+            <td>
+                <code>path</code>: Project path<br>
+                <code>name</code>: Project name<br>
+                <code>description</code>: Project description (optional)
+            </td>
+        </tr>
+        <tr>
+            <td><code>git_operation</code></td>
+            <td>Perform Git operations</td>
+            <td>
+                <code>operation</code>: Git operation (clone, init, status, etc.)<br>
+                <code>path</code>: Path for operation<br>
+                <code>args</code>: Additional arguments (optional)
+            </td>
+        </tr>
+        <tr>
+            <td><code>run_command</code></td>
+            <td>Execute a shell command</td>
+            <td>
+                <code>command</code>: Command to run<br>
+                <code>cwd</code>: Working directory (optional)
+            </td>
+        </tr>
+        <tr>
+            <td><code>ping</code></td>
+            <td>Check server status</td>
+            <td>None</td>
+        </tr>
+    </table>
+    
+    <h2>Available Resources</h2>
+    
+    <table>
+        <tr>
+            <th>Resource</th>
+            <th>URI Template</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>File</td>
+            <td><code>file://{path}</code></td>
+            <td>Access files and directories. Supports both text and binary files.</td>
+        </tr>
+        <tr>
+            <td>Project</td>
+            <td><code>project://{path}</code></td>
+            <td>Get project structure information, including files and package details.</td>
+        </tr>
+    </table>
+    
+    <h2>Available Prompts</h2>
+    
+    <table>
+        <tr>
+            <th>Prompt</th>
+            <th>Description</th>
+            <th>Parameters</th>
+        </tr>
+        <tr>
+            <td><code>code-review</code></td>
+            <td>Get a detailed code review</td>
+            <td>
+                <code>code</code>: Code to review<br>
+                <code>language</code>: Programming language (optional)
+            </td>
+        </tr>
+        <tr>
+            <td><code>generate-tests</code></td>
+            <td>Generate tests for code</td>
+            <td>
+                <code>code</code>: Code to test<br>
+                <code>framework</code>: Test framework (optional)<br>
+                <code>language</code>: Programming language (optional)
+            </td>
+        </tr>
+        <tr>
+            <td><code>generate-docs</code></td>
+            <td>Generate documentation for code</td>
+            <td>
+                <code>code</code>: Code to document<br>
+                <code>style</code>: Documentation style (optional)<br>
+                <code>language</code>: Programming language (optional)
+            </td>
+        </tr>
+        <tr>
+            <td><code>refactor-code</code></td>
+            <td>Get refactoring suggestions</td>
+            <td>
+                <code>code</code>: Code to refactor<br>
+                <code>goal</code>: Refactoring goal (optional)<br>
+                <code>language</code>: Programming language (optional)
+            </td>
+        </tr>
+    </table>
+    
+    <h2>API Usage</h2>
+    
+    <p>The server implements the MCP specification. See the <a href="https://modelcontextprotocol.io/specification/" target="_blank">MCP Specification</a> for detailed information on the protocol.</p>
+    
+    <h3>HTTP Transport</h3>
+    
+    <p>For HTTP transport, the server exposes the following endpoints:</p>
+    
+    <ul>
+        <li><span class="method">POST</span> <span class="path">/mcp</span> - Send requests to the server</li>
+        <li><span class="method">GET</span> <span class="path">/mcp</span> - Receive server-to-client notifications via SSE</li>
+        <li><span class="method">DELETE</span> <span class="path">/mcp</span> - Terminate a session</li>
+    </ul>
+    
+    <p>The server supports session management via the <code>mcp-session-id</code> header.</p>
+    
+    <h3>JavaScript Example</h3>
+    
+    <pre><code>import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
+
+async function connectToServer() {
+  // Create a transport
+  const transport = new StreamableHTTPClientTransport(
+    new URL("http://localhost:3000/mcp")
+  );
+  
+  // Create a client
+  const client = new Client({
+    name: "code-tools-client",
+    version: "1.0.0",
+  });
+  
+  // Connect to the server
+  await client.connect(transport);
+  
+  // Use server tools, resources, and prompts
+  const result = await client.callTool({
+    name: "ping",
+    arguments: {},
+  });
+  
+  console.log(result);
+}
+
+connectToServer();</code></pre>
+
+    <footer>
+        <p>CodeTools MCP Server &copy; 2025</p>
+    </footer>
+</body>
+</html>

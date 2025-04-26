@@ -1,0 +1,64 @@
+{
+  "total": 18,
+  "passed": 15,
+  "failed": 3,
+  "tests": [
+    {
+      "success": true
+    },
+    {
+      "success": true
+    },
+    {
+      "success": true
+    },
+    {
+      "success": true
+    },
+    {
+      "success": true
+    },
+    {
+      "success": true
+    },
+    {
+      "success": true
+    },
+    {
+      "success": true
+    },
+    {
+      "success": true
+    },
+    {
+      "success": true
+    },
+    {
+      "success": true
+    },
+    {
+      "success": false,
+      "error": "MCP error -32602: MCP error -32602: Resource file:///Users/adityasharma/Projects/local-mcp-code-tools/test/test-sample.js not found"
+    },
+    {
+      "success": false,
+      "error": "MCP error -32602: MCP error -32602: Resource file:///Users/adityasharma/Projects/local-mcp-code-tools/test not found"
+    },
+    {
+      "success": false,
+      "error": "MCP error -32602: MCP error -32602: Resource project:///Users/adityasharma/Projects/local-mcp-code-tools/test/project-test not found"
+    },
+    {
+      "success": true
+    },
+    {
+      "success": true
+    },
+    {
+      "success": true
+    },
+    {
+      "success": true
+    }
+  ]
+}

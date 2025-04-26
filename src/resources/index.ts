@@ -1,25 +1,27 @@
 /**
- * Resources module index
+ * Resources index
+ *
+ * Exports all resource registrations
  */
 
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { registerFileResource } from './file-resource.js';
-import { registerProjectResource } from './project-resource.js';
-import { logger } from '../utils/index.js';
+import { registerFileResource } from "./file-resource.js";
+import { registerProjectResource } from "./project-resource.js";
+import { logger } from "../utils/index.js";
 
 /**
  * Register all resources with the MCP server
- * @param {McpServer} server - The MCP server instance
+ * @param {import('@modelcontextprotocol/sdk/server/mcp').McpServer} server - The MCP server instance
  */
-export function registerResources(server: McpServer): void {
-  logger.info('Registering all resources');
-  
+export function registerAllResources(server: any): void {
+  logger.info("Registering all resources");
   registerFileResource(server);
   registerProjectResource(server);
 }
 
+export { registerFileResource, registerProjectResource };
+
 export default {
-  registerResources,
+  registerAllResources,
   registerFileResource,
   registerProjectResource,
 };

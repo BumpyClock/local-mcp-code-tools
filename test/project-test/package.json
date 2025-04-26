@@ -1,0 +1,17 @@
+{
+  "name": "mcp-test-project",
+  "version": "1.0.0",
+  "description": "Test project for MCP server testing",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["mcp", "test"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

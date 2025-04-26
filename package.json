@@ -6,25 +6,38 @@
   "type": "module",
   "bin": {
     "code-tools-server": "dist/bin/server.js",
-    "code-tools-client": "dist/bin/client.js"
+    "code-tools-client": "dist/bin/client.js",
+    "code-tools-http": "dist/bin/http-server.js"
   },
   "scripts": {
     "build": "tsc",
     "start": "node dist/bin/server.js",
     "client": "node dist/bin/client.js",
+    "http": "node dist/bin/http-server.js",
     "dev": "tsc-watch --onSuccess \"node dist/bin/server.js\"",
+    "dev:http": "tsc-watch --onSuccess \"node dist/bin/http-server.js\"",
     "lint": "eslint --ext .ts src/",
-    "test": "echo \"No tests configured\"",
+    "test": "node client.js",
+    "test:http": "node client.js --http",
     "clean": "rimraf dist"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "latest",
+    "@modelcontextprotocol/sdk": "^1.10.2",
+    "cors": "^2.8.5",
     "diff": "^5.1.0",
+    "express": "^4.18.2",
+    "js-yaml": "^4.1.0",
+    "marked": "^15.0.10",
+    "turndown": "^7.2.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.17",
     "@types/diff": "^5.0.8",
+    "@types/express": "^4.17.21",
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^20.10.5",
+    "@types/turndown": "^5.0.5",
     "@typescript-eslint/eslint-plugin": "^6.15.0",
     "@typescript-eslint/parser": "^6.15.0",
     "eslint": "^8.56.0",

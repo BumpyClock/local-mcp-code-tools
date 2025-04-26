@@ -1,7 +1,8 @@
 /**
- * File Resource
+ * Fixed File Resource
  *
  * Resource for accessing files and directories in the filesystem
+ * with improved URI handling
  */
 
 import { ResourceTemplate } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -30,31 +31,63 @@ function validateFilePath(filePath: string): void {
 }
 
 /**
+ * Extract a file path from a URL
+ * @param {URL} uri - The resource URI
+ * @param {Record<string, unknown>} variables - The variables from the resource template
+ * @returns {string} The file path
+ */
+function extractFilePath(uri: URL, variables: Record<string, unknown>): string {
+  logger.debug(`Extracting file path from URI: ${uri.href}`, { 
+    protocol: uri.protocol,
+    pathname: uri.pathname,
+    variables
+  });
+  
+  let filePath;
+  
+  // If the URI uses the file: protocol, extract the path directly from the URI
+  if (uri.protocol === 'file:') {
+    // Extract path from the full URI pathname
+    filePath = decodeURIComponent(uri.pathname);
+    
+    // On Windows, remove leading slash if present and path has a drive letter
+    if (process.platform === 'win32' && filePath.startsWith('/') && filePath[2] === ':') {
+      filePath = filePath.slice(1);
+    }
+  } else {
+    // Fall back to the variables if for some reason the protocol isn't file:
+    filePath = decodeURIComponent(String(variables.path));
+  }
+  
+  logger.debug(`Extracted file path: ${filePath}`);
+  
+  // If path starts with a drive letter in Windows (C:/) or / in Unix, use as-is
+  // Otherwise, treat as a relative path
+  if (!path.isAbsolute(filePath)) {
+    logger.debug(`Converting relative path to absolute: ${filePath}`);
+    filePath = path.resolve(process.cwd(), filePath);
+  }
+  
+  return filePath;
+}
+
+/**
  * Register the file resource with the MCP server
  * @param {McpServer} server - The MCP server instance
  */
 export function registerFileResource(server: McpServer): void {
-  logger.info("Registering file resource");
+  logger.info("Registering file resource with improved URI handling");
 
   server.resource(
     "file",
-    new ResourceTemplate("file://{path}", { list: undefined }),
+    new ResourceTemplate("file://{path*}", { list: undefined }),
     async (
       uri: URL,
       variables: Record<string, unknown>
     ): Promise<ResourceResponse> => {
-      // Properly decode URI path components and normalize
-      let filePath = decodeURIComponent(String(variables.path));
-      
-      // If path starts with a drive letter in Windows (C:/) or / in Unix, use as-is
-      // Otherwise, treat as a relative path
-      if (!path.isAbsolute(filePath)) {
-        logger.debug(`Converting relative path to absolute: ${filePath}`);
-        filePath = path.resolve(process.cwd(), filePath);
-      }
-      
       try {
-        // Validate the file path for safety
+        // Extract and validate the file path
+        const filePath = extractFilePath(uri, variables);
         validateFilePath(filePath);
         
         logger.debug(`Reading resource: ${filePath}`);
@@ -69,18 +102,18 @@ export function registerFileResource(server: McpServer): void {
         const err = error as Error;
         const errorCode = (error as NodeJS.ErrnoException).code;
         
-        logger.error(`Failed to read resource '${filePath}':`, {
+        logger.error(`Failed to read resource '${uri.href}':`, {
           error: err.message,
           code: errorCode
         });
         
         // More descriptive error messages based on error type
         if (errorCode === 'ENOENT') {
-          throw new Error(`File or directory not found at path: ${filePath}. Please check that the path exists and is accessible.`);
+          throw new Error(`File or directory not found at path: ${uri.pathname}. Please check that the path exists and is accessible.`);
         } else if (errorCode === 'EACCES') {
-          throw new Error(`Permission denied when accessing: ${filePath}. Please check file permissions.`);
+          throw new Error(`Permission denied when accessing: ${uri.pathname}. Please check file permissions.`);
         } else {
-          throw new Error(`Failed to read file/directory at '${filePath}': ${err.message}`);
+          throw new Error(`Failed to read file/directory at '${uri.href}': ${err.message}`);
         }
       }
     }

@@ -1,12 +1,12 @@
 /**
  * Process utility functions for CodeTools MCP
- * 
+ *
  * Provides helper functions for running child processes safely
  */
 
-import { spawn } from 'child_process';
-import { ProcessOptions, ProcessResult, ProcessUtils } from '../types/index.js';
-import logger from './logger.js';
+import { spawn } from "child_process";
+import { ProcessOptions, ProcessResult, ProcessUtils } from "../types/index.js";
+import logger from "./logger.js";
 
 /**
  * Safely run a command in a child process
@@ -16,8 +16,8 @@ import logger from './logger.js';
  * @returns {Promise<ProcessResult>}
  */
 export async function runProcess(
-  command: string, 
-  args: string[] = [], 
+  command: string,
+  args: string[] = [],
   options: ProcessOptions = {}
 ): Promise<ProcessResult> {
   const {
@@ -26,24 +26,24 @@ export async function runProcess(
     shell = true,
     allowNonZeroExitCode = false,
   } = options;
-  
-  logger.debug(`Running command: ${command} ${args.join(' ')}`, { cwd });
-  
+
+  logger.debug(`Running command: ${command} ${args.join(" ")}`, { cwd });
+
   return new Promise((resolve, reject) => {
     const proc = spawn(command, args, {
       cwd: cwd || undefined,
       shell,
-      stdio: ['pipe', 'pipe', 'pipe'],
+      stdio: ["pipe", "pipe", "pipe"],
     });
-    
-    let stdout = '';
-    let stderr = '';
 
-    proc.stdout.on('data', (data) => {
+    let stdout = "";
+    let stderr = "";
+
+    proc.stdout.on("data", (data) => {
       stdout += data.toString();
     });
 
-    proc.stderr.on('data', (data) => {
+    proc.stderr.on("data", (data) => {
       stderr += data.toString();
     });
 
@@ -52,13 +52,13 @@ export async function runProcess(
       proc.stdin.end();
     }
 
-    proc.on('close', (code) => {
+    proc.on("close", (code) => {
       logger.debug(`Command completed with exit code: ${code}`, {
         command,
         args,
         cwd,
       });
-      
+
       if (code === 0 || allowNonZeroExitCode) {
         resolve({ stdout, stderr, code: code ?? -1 });
       } else {
@@ -66,19 +66,21 @@ export async function runProcess(
           stdout,
           stderr,
           code,
-          message: `Command failed with exit code ${code}: ${command} ${args.join(' ')}`,
+          message: `Command failed with exit code ${code}: ${command} ${args.join(
+            " "
+          )}`,
         });
       }
     });
 
-    proc.on('error', (err) => {
+    proc.on("error", (err) => {
       logger.error(`Command failed to execute: ${command}`, {
         error: err.message,
         command,
         args,
         cwd,
       });
-      
+
       reject({
         error: err.message,
         stdout,

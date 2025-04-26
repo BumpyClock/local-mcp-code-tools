@@ -36,3 +36,4 @@ logs/
 
 # Test coverage
 coverage/
+test_output/

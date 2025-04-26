@@ -3,7 +3,7 @@
  */
 
 export interface LogData {
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface ProcessResult {
@@ -32,23 +32,26 @@ export interface FileReadResult {
 
 export interface ToolResponse {
   content: Array<{
-    type: string;
+    type: "text";
     text: string;
+    [x: string]: unknown;
   }>;
   isError: boolean;
+  _meta?: Record<string, unknown>;
+  [x: string]: unknown;
 }
 
 export interface ResourceResponse {
-  contents: Array<{
-    uri: string;
-    text?: string;
-    blob?: string;
-    mimeType?: string;
-  }>;
+  contents: Array<
+    | { uri: string; text: string; mimeType?: string }
+    | { uri: string; blob: string; mimeType?: string }
+  >;
+  _meta?: Record<string, unknown>;
+  [key: string]: unknown;
 }
 
 export interface PromptMessage {
-  role: 'user' | 'assistant' | 'system';
+  role: "user" | "assistant" | "system";
   content: {
     type: string;
     text: string;
@@ -59,7 +62,7 @@ export interface PromptResponse {
   messages: PromptMessage[];
 }
 
-export type LogLevel = 'ERROR' | 'WARN' | 'INFO' | 'DEBUG';
+export type LogLevel = "ERROR" | "WARN" | "INFO" | "DEBUG";
 
 export interface Logger {
   error: (message: string, data?: LogData) => void;
@@ -75,11 +78,18 @@ export interface FileUtils {
   isBinaryFile: (filePath: string) => boolean;
   ensureDirectory: (dirPath: string, recursive?: boolean) => Promise<void>;
   safeWriteFile: (filePath: string, content: string | Buffer) => Promise<void>;
-  safeReadFile: (filePath: string, forceBinary?: boolean) => Promise<FileReadResult>;
+  safeReadFile: (
+    filePath: string,
+    forceBinary?: boolean
+  ) => Promise<FileReadResult>;
 }
 
 export interface ProcessUtils {
-  runProcess: (command: string, args?: string[], options?: ProcessOptions) => Promise<ProcessResult>;
+  runProcess: (
+    command: string,
+    args?: string[],
+    options?: ProcessOptions
+  ) => Promise<ProcessResult>;
 }
 
 export interface Utils {
